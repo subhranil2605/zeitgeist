@@ -35,6 +35,7 @@ def main():
     client = ChatGoogleGenerativeAI(
         model=MODEL,
         temperature=0.3,
+        api_key=os.environ.get("GOOGLE_API_KEY")
     )
     entries = []
 
