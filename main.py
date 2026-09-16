@@ -4,7 +4,7 @@ import sys
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src import db, render, scraper, summarize
+from src import db, render, scraper, send, summarize
 
 load_dotenv()
 
@@ -71,7 +71,19 @@ def main():
 
     html = render.render_digest(LANGUAGE, entries)
 
-    print(html)
+    # with open("index.html", "w", encoding="utf-8") as f:
+    #     f.write(html)
+
+    try:
+        send.send_digest(html, LANGUAGE)
+    except Exception as exc:
+        # Resend failure: log and stop. The DB write above already happened,
+        # so nothing is lost -- save the HTML for a manual resend if needed.
+        print(f"ERROR: send failed: {exc}", file=sys.stderr)
+        os.makedirs("data", exist_ok=True)
+        with open("data/last_failed_digest.html", "w", encoding="utf-8") as f:
+            f.write(html)
+        return 1
 
     print(f"OK: sent digest for {len(entries)} repos.")
     return 0
