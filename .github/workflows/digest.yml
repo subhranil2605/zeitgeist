@@ -1,0 +1,38 @@
+name: Daily GitHub Trending Digest
+
+on:
+  schedule:
+    - cron: "0 13 * * *"  # ~13:00 UTC daily; Actions cron can slip under load, treat as approximate
+  workflow_dispatch: {}     # lets you trigger a run manually from the Actions tab
+
+jobs:
+  run-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run digest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_FROM_EMAIL: ${{ secrets.DIGEST_FROM_EMAIL }}
+          DIGEST_TO_EMAIL: ${{ secrets.DIGEST_TO_EMAIL }}
+          DIGEST_LANGUAGE: python
+        run: python main.py
+
+      # Actions runners are ephemeral -- data/repos.db would reset to empty
+      # every run without this step, silently breaking recurrence dedup (F4).
+      - name: Persist database back to the repo
+        run: |
+          git config user.name "github-trending-digest-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/repos.db
+          git diff --cached --quiet || git commit -m "Update trending digest db [skip ci]"
+          git push
