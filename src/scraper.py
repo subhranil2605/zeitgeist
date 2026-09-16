@@ -65,7 +65,7 @@ def _parse_row(row) -> dict:
         "language": language,
         "stars_total": stars_total,
         "stars_today": stars_today,
-        "url": f"https://githuc.com/{full_name}" if full_name else None,
+        "url": f"https://github.com/{full_name}" if full_name else None,
     }
 
     return result
