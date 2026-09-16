@@ -22,7 +22,7 @@ jobs:
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          DIGEST_FROM_EMAIL: ${{ secrets.DIGEST_FROM_EMAIL }}
+          DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
           DIGEST_TO_EMAIL: ${{ secrets.DIGEST_TO_EMAIL }}
           DIGEST_LANGUAGE: python
         run: python main.py
