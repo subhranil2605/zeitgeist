@@ -1,0 +1,4 @@
+I mostly build AI systems, backend services, and automation platforms in Python. 
+I have interest in Rust, TypeScript, Nextjs projects.
+I'm particularly interested in agentic AI, LLMOps, RAG systems, workflow orchestration, and the infrastructure that makes AI applications reliable in production. 
+I enjoy working on practical systems that combine reasoning models with APIs, databases, queues, and cloud services rather than purely research-focused machine learning. I tend to prefer lightweight, composable tools and architectures over large monolithic frameworks, and I like understanding how systems work under the hood. While I have full-stack experience, I spend most of my time on backend architecture, AI orchestration, model evaluation, and developer tooling rather than frontend-heavy development.

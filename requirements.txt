@@ -1,0 +1,4 @@
+beautifulsoup4==4.15.0
+langchain-google-genai==4.4.0
+python-dotenv==1.2.3
+requests==2.34.2
