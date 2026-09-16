@@ -13,6 +13,12 @@
       "skillPath": "skills/audit/SKILL.md",
       "computedHash": "a8d524118ce6d60911840ef31509f1f5551ce1099cb8fd8a241ed0859e5c62ed"
     },
+    "beautifulsoup-parsing": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "beautifulsoup-parsing/SKILL.md",
+      "computedHash": "e4dc915cc1a3fa7f8085643de8d837c2de03bab6e5bf8e2cb32fd173c4b889f0"
+    },
     "check": {
       "source": "jsmastery-pro/skills",
       "sourceType": "github",
@@ -36,6 +42,30 @@
       "sourceType": "github",
       "skillPath": "skills/document/SKILL.md",
       "computedHash": "90933443f204d2ed29c84730be87b7b5470f6819fccde6129aedad1df517fb92"
+    },
+    "gemini-api-dev": {
+      "source": "google-gemini/gemini-skills",
+      "sourceType": "github",
+      "skillPath": "skills/gemini-api-dev/SKILL.md",
+      "computedHash": "820ebd2b43063fcaf77a564f15cfe381dc03e97b99a4f453131f398c7620c809"
+    },
+    "github-actions-templates": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/cicd-automation/skills/github-actions-templates/SKILL.md",
+      "computedHash": "93e92fd674dea084628e95f9c48af806f9672ac08f815c84f85adedb55742c59"
+    },
+    "langchain-fundamentals": {
+      "source": "langchain-ai/langchain-skills",
+      "sourceType": "github",
+      "skillPath": "config/skills/langchain-fundamentals/SKILL.md",
+      "computedHash": "5a1ded1b185ed95aab2b795f6134ce1ea9c19dddc5d5c8f291b31c0db4f0e379"
+    },
+    "resend": {
+      "source": "resend/resend-skills",
+      "sourceType": "github",
+      "skillPath": "skills/resend/SKILL.md",
+      "computedHash": "88f19195f1861ea96c1cc82f27d2d2b394a226155390822eb38e120f7eec5c84"
     },
     "scope": {
       "source": "jsmastery-pro/skills",
