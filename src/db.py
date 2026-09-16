@@ -1,4 +1,5 @@
 import hashlib
+import os
 import sqlite3
 from datetime import UTC, date, datetime, timedelta
 
@@ -26,6 +27,9 @@ REFRESH_AFTER_DAYS = 7
 
 
 def connect(path: str = DB_PATH) -> sqlite3.Connection:
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
     conn = sqlite3.connect(path)
     conn.execute(SCHEMA)
     return conn
