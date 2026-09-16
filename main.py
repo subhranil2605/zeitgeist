@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -7,6 +8,13 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from src import db, render, scraper, send, summarize
 
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s",
+    stream=sys.stderr,
+)
+logger = logging.getLogger("zeitgeist")
 
 LANGUAGE = os.environ.get("DIGEST_LANGUAGE", "python")
 PROFILE_PATH = os.environ.get("DIGEST_PROFILE_PATH", "interests.txt")
@@ -20,14 +28,14 @@ def main():
     try:
         repos = scraper.fetch_trending(LANGUAGE)
     except Exception as exc:
-        print(f"ABORT: scrape request failed: {exc}", file=sys.stderr)
+        logger.error("ABORT: scrape request failed: %s", exc)
         return 1
 
     if not scraper.check_parse_quality(repos):
-        print(
-            f"ABORT: structure-check guard failed on {len(repos)} parsed rows "
+        logger.error(
+            "ABORT: structure-check guard failed on %d parsed rows "
             "-- github.com/trending's HTML structure may have changed.",
-            file=sys.stderr,
+            len(repos),
         )
         return 1
 
@@ -50,9 +58,8 @@ def main():
                 summary, use_cases = summarize.summarize_repo(client, repo, profile)
             except Exception as exc:
                 # One repo's LLM call failing shouldn't kill the whole run.
-                print(
-                    f"WARN: summarization failed for {repo['full_name']}: {exc}",
-                    file=sys.stderr,
+                logger.warning(
+                    "summarization failed for %s: %s", repo["full_name"], exc
                 )
                 continue
         else:
@@ -64,10 +71,7 @@ def main():
     conn.close()
 
     if not entries:
-        print(
-            "ABORT: no repos left to report after parsing/summarization.",
-            file=sys.stderr,
-        )
+        logger.error("ABORT: no repos left to report after parsing/summarization.")
         return 1
 
     html = render.render_digest(LANGUAGE, entries)
@@ -80,13 +84,13 @@ def main():
     except Exception as exc:
         # Resend failure: log and stop. The DB write above already happened,
         # so nothing is lost -- save the HTML for a manual resend if needed.
-        print(f"ERROR: send failed: {exc}", file=sys.stderr)
+        logger.error("ERROR: send failed: %s", exc)
         os.makedirs("data", exist_ok=True)
         with open("data/last_failed_digest.html", "w", encoding="utf-8") as f:
             f.write(html)
         return 1
 
-    print(f"OK: sent digest for {len(entries)} repos.")
+    logger.info("OK: sent digest for %d repos.", len(entries))
     return 0
 
 
