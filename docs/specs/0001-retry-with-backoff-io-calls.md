@@ -1,7 +1,7 @@
 # 0001. Retry with backoff on I/O calls
 
 **Date**: 2026-09-17
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

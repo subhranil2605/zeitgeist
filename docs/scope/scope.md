@@ -19,7 +19,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | F | Pipeline orchestration | Existing | existing |
 | G | Daily GitHub Actions cron | Existing | existing |
 | 1 | Structured logging | Foundation | in-progress |
-| 2 | Retry with backoff on I/O calls | Slice 1: Reliability hardening | in-progress |
+| 2 | Retry with backoff on I/O calls | Slice 1: Reliability hardening | done |
 | 3 | Exception handling hardening | Slice 2: Reliability hardening | planned |
 
 ## Existing
@@ -65,7 +65,7 @@ spec [0001](../specs/0001-retry-with-backoff-io-calls.md)
   - [x] Retry the Gemini summarize call on transient rate-limit/server/transport failures, satisfies AC-2, AC-4, AC-5, AC-6
   - [x] Retry the Resend send call on transient rate-limit/server/transport failures, satisfies AC-3, AC-4, AC-5, AC-6
 - [x] Verify it: `/check verify retry with backoff on I/O calls`
-- [ ] Test it: `/test retry with backoff on I/O calls`
+- [x] Test it: `/test retry with backoff on I/O calls`
 
 ## Slice 2: Reliability hardening
 
