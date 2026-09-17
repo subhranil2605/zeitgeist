@@ -19,7 +19,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | F | Pipeline orchestration | Existing | existing |
 | G | Daily GitHub Actions cron | Existing | existing |
 | 1 | Structured logging | Foundation | in-progress |
-| 2 | Retry with backoff on I/O calls | Slice 1: Reliability hardening | planned · needs a decision |
+| 2 | Retry with backoff on I/O calls | Slice 1: Reliability hardening | in-progress |
 | 3 | Exception handling hardening | Slice 2: Reliability hardening | planned |
 
 ## Existing
@@ -54,10 +54,18 @@ Replace the `print(..., file=sys.stderr)` calls with Python's `logging` module, 
 
 ## Slice 1: Reliability hardening
 
-### 2. Retry with backoff on I/O calls · needs a decision
-The scrape request, the per-repo LLM call, and the Resend send each get retry with backoff on transient failures before the pipeline's existing hard-stop/skip/fallback behavior kicks in. Needs a decision: retry library (e.g. the `tenacity` transitive dependency already on disk vs a small manual backoff loop), attempt/backoff policy, and which exceptions count as retryable per call site.
+### 2. Retry with backoff on I/O calls
+The scrape request, the per-repo LLM call, and the Resend send each get retry with backoff on transient failures before the pipeline's existing hard-stop/skip/fallback behavior kicks in.
 **Done when:** a transient failure at any of the three call sites is retried with backoff before falling through to today's behavior (scrape failure still aborts the run after retries are exhausted, an LLM failure still only skips that one repo, a send failure still falls back to saved HTML) — permanent failures are not retried into a longer outage.
-- [ ] Design it (spec): `/architect retry with backoff on I/O calls`
+spec [0001](../specs/0001-retry-with-backoff-io-calls.md)
+- [x] Design it (spec): `/architect retry with backoff on I/O calls`
+- [x] Build it: `/develop retry with backoff on I/O calls` · code in `src/scraper.py`, `src/summarize.py`, `src/send.py`
+  - [x] Add `tenacity` as a direct dependency, pinned to the version already resolved in `uv.lock`, satisfies AC-1, AC-2, AC-3
+  - [x] Retry the scrape call on transient network/5xx/429 failures, satisfies AC-1, AC-4, AC-5, AC-6
+  - [x] Retry the Gemini summarize call on transient rate-limit/server/transport failures, satisfies AC-2, AC-4, AC-5, AC-6
+  - [x] Retry the Resend send call on transient rate-limit/server/transport failures, satisfies AC-3, AC-4, AC-5, AC-6
+- [x] Verify it: `/check verify retry with backoff on I/O calls`
+- [ ] Test it: `/test retry with backoff on I/O calls`
 
 ## Slice 2: Reliability hardening
 

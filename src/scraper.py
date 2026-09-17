@@ -1,12 +1,48 @@
+import logging
 import re
 
 import requests
 from bs4 import BeautifulSoup
+from tenacity import (
+    RetryCallState,
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential_jitter,
+)
 
 TRENDING_URL = "https://github.com/trending/{language}?since=daily"
 USER_AGENT = "github-trending-digest/1.0 (personal project, 1 request/day)"
 
+logger = logging.getLogger("zeitgeist")
 
+_RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
+
+
+def _is_transient_scrape_error(exc: BaseException) -> bool:
+    if isinstance(exc, (requests.exceptions.ConnectionError, requests.exceptions.Timeout)):
+        return True
+    if isinstance(exc, requests.exceptions.HTTPError):
+        response = exc.response
+        return response is not None and response.status_code in _RETRYABLE_STATUS_CODES
+    return False
+
+
+def _log_before_sleep(retry_state: RetryCallState) -> None:
+    logger.warning(
+        "scrape: attempt %d failed, retrying in %.1fs",
+        retry_state.attempt_number,
+        retry_state.next_action.sleep,
+    )
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential_jitter(initial=2, max=30),
+    retry=retry_if_exception(_is_transient_scrape_error),
+    before_sleep=_log_before_sleep,
+    reraise=True,
+)
 def fetch_trending(language: str) -> list[dict]:
     """Return one dict per repo row on today's trending page.
 

@@ -1,6 +1,34 @@
+import logging
+
+import httpx
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai.chat_models import GoogleAPIError, GoogleRateLimitError
 from pydantic import BaseModel
+from tenacity import (
+    RetryCallState,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential_jitter,
+)
+
+logger = logging.getLogger("zeitgeist")
+
+_RETRYABLE_EXCEPTIONS = (
+    GoogleRateLimitError,
+    GoogleAPIError,
+    httpx.TimeoutException,
+    httpx.ConnectError,
+)
+
+
+def _log_before_sleep(retry_state: RetryCallState) -> None:
+    logger.warning(
+        "summarize: attempt %d failed, retrying in %.1fs",
+        retry_state.attempt_number,
+        retry_state.next_action.sleep,
+    )
 
 PROMPT_TEMPLATE = """You are writing one entry in a daily GitHub trending email digest for a developer with this profile:
  
@@ -30,6 +58,13 @@ class SummaryResult(BaseModel):
     use_cases: str
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential_jitter(initial=2, max=30),
+    retry=retry_if_exception_type(_RETRYABLE_EXCEPTIONS),
+    before_sleep=_log_before_sleep,
+    reraise=True,
+)
 def summarize_repo(
     client: ChatGoogleGenerativeAI, repo: dict, profile: str
 ) -> tuple[str, str]:

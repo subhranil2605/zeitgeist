@@ -936,6 +936,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "resend" },
+    { name = "tenacity" },
 ]
 
 [package.metadata]
@@ -945,6 +946,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.2.3" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "resend", specifier = ">=2.46.0" },
+    { name = "tenacity", specifier = ">=9.1.4" },
 ]
 
 [[package]]
